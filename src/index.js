@@ -12,7 +12,7 @@ const cardList = document.querySelector('.places__list');
 // Функция создания карточки
 const imageModal = document.querySelector('.popup_type_image');
 
-function createCard (card, deleteCard) {
+function createCard (card, deleteCard, like, openImage) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
     cardImage.src = card.link;
@@ -58,7 +58,7 @@ function deleteCard(evt) {
 // Вывести карточки на страницу
 
 initialCards.forEach (function(card) {
-    const newCard = createCard(card, deleteCard);
+    const newCard = createCard(card, deleteCard, like, openImage);
     cardList.append(newCard);
 })
 
