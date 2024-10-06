@@ -1,59 +1,22 @@
-import '../pages/index.css';
+// Импорт файлов
+
+import './pages/index.css';
 import { initialCards } from './scripts/cards.js';
-
-// Темплейт карточки
-
-const cardTemplate = document.querySelector('#card-template').content;
+import { openModal, closeModal, closeModalEscape, closeModalOverlay } from './components/modal.js';
+import { createCard, openImage, like, deleteCard } from './components/card.js';
 
 // DOM узлы
 
 const cardList = document.querySelector('.places__list');
-
-// Функция создания карточки
-const imageModal = document.querySelector('.popup_type_image');
-
-function createCard (card, deleteCard, like, openImage) {
-    const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
-    const cardImage = cardElement.querySelector('.card__image');
-    cardImage.src = card.link;
-    cardImage.alt = card.name;
-    cardElement.querySelector('.card__title').textContent = card.name;
-
-    const deleteButton = cardElement.querySelector('.card__delete-button');
-    deleteButton.addEventListener('click', deleteCard);
-    
-    const likeButton = cardElement.querySelector('.card__like-button');
-    likeButton.addEventListener('click', like);
-
-    cardImage.addEventListener('click', openImage);
-
-    return cardElement;
-}
-    
-// Функция открытия картинки из карточки 
-
-function openImage() {
-    imageModal.classList.add('popup_is-opened', 'popup_is-animated');
-    const image = document.querySelector('.popup__image');
-    const description = document.querySelector('.popup__caption');
-    image.src = this.src;
-    description.textContent = this.alt;
-}
-
-// Функция лайка карточки
-
-function like(evt) {
-    const eventTarget = evt.target;
-    eventTarget.classList.toggle('card__like-button_is-active');
-}
-
-// Функция удаления карточки
-
-function deleteCard(evt) {
-    const eventTarget = evt.target;
-    const card = eventTarget.closest('.card');
-    card.remove();
-}
+const buttonEdit = document.querySelector('.profile__edit-button');
+const modalEdit = document.querySelector('.popup_type_edit');
+const modals = document.querySelectorAll('.popup')
+const buttonsClose = document.querySelectorAll('.popup__close');
+const modalCard = document.querySelector('.popup_type_new-card');
+const buttonAdd = document.querySelector('.profile__add-button');
+const formCard = document.forms['new-place'];
+const placeInput = formCard.elements['place-name'];
+const linkInput = formCard.elements.link;
 
 // Вывести карточки на страницу
 
@@ -62,45 +25,13 @@ initialCards.forEach (function(card) {
     cardList.append(newCard);
 })
 
-// Открытие и закрытие модального окна редактировать 
-
-
-const buttonEdit = document.querySelector('.profile__edit-button');
-const modalEdit = document.querySelector('.popup_type_edit');
-const modals = document.querySelectorAll('.popup')
-const modalContent = document.querySelector('.popup__content');
-const buttonsClose = document.querySelectorAll('.popup__close');
-
-function openModal(popup) {
-    return function() {
-        popup.classList.add('popup_is-opened', 'popup_is-animated');
-    }
-}
-
-function closeModal(popup) {
-    return function() {
-        popup.classList.remove('popup_is-opened');
-    }
-}
-
-function closeModalEscape(popup) {
-    return function(evt) {
-        if (evt.key === 'Escape') {
-            closeModal(popup)();
-        }
-    }
-}
-
-function closeModalOverlay(evt) {
-    const eventTarget = evt.target;
-    if (eventTarget.classList.contains('popup') && !eventTarget.classList.contains('modalContent')) {
-        closeModal(eventTarget)(); 
-    }
-}
+// Открытие и закрытие модальных окон
 
 document.addEventListener('click', closeModalOverlay)
 
 buttonEdit.addEventListener('click', openModal(modalEdit));
+
+buttonAdd.addEventListener('click', openModal(modalCard));
 
 buttonsClose.forEach(button => {
     button.addEventListener('click', function() {
@@ -110,8 +41,6 @@ buttonsClose.forEach(button => {
         }
     });
 });
-
-document.addEventListener('keydown', closeModalEscape(modalEdit));
 
 modals.forEach(function(modal) {
     document.addEventListener('keydown', closeModalEscape(modal))
@@ -143,23 +72,13 @@ formProfile.addEventListener('submit', handleFormSubmit);
 
 // добавление своей карточки 
 
-const modalCard = document.querySelector('.popup_type_new-card');
-const buttonAdd = document.querySelector('.profile__add-button');
-
-buttonAdd.addEventListener('click', openModal(modalCard));
-document.addEventListener('keydown', closeModalEscape(modalCard));
-
-const formCard = document.forms['new-place'];
-const placeInput = formCard.elements['place-name'];
-const linkInput = formCard.elements.link;
-
 function handleFormCardSubmit(evt) {
     evt.preventDefault();
     const newPlace = placeInput.value;
     const newLink = linkInput.value;
     const newInfo = { name: newPlace, link: newLink };
     initialCards.unshift(newInfo);
-    const newCard = createCard(newInfo, deleteCard);
+    const newCard = createCard(newInfo, deleteCard, like,  openImage);
     cardList.prepend(newCard);
     closeModal(modalCard)();
     formCard.reset();
