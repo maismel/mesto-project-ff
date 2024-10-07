@@ -1,12 +1,14 @@
 function openModal(popup) {
     return function() {
         popup.classList.add('popup_is-opened', 'popup_is-animated');
+        document.addEventListener('click', closeModalOverlay);
     }
 }
 
 function closeModal(popup) {
     return function() {
         popup.classList.remove('popup_is-opened');
+        document.removeEventListener('click', closeModalOverlay);
     }
 }
 

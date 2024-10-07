@@ -27,8 +27,6 @@ initialCards.forEach (function(card) {
 
 // Открытие и закрытие модальных окон
 
-document.addEventListener('click', closeModalOverlay)
-
 buttonEdit.addEventListener('click', openModal(modalEdit));
 
 buttonAdd.addEventListener('click', openModal(modalCard));
