@@ -3,7 +3,7 @@
 import './pages/index.css';
 import { initialCards } from './scripts/cards.js';
 import { openModal, closeModal, closeModalEscape, closeModalOverlay } from './components/modal.js';
-import { createCard, openImage, like, deleteCard } from './components/card.js';
+import { createCard, like, deleteCard } from './components/card.js';
 
 // DOM узлы
 
@@ -17,6 +17,9 @@ const buttonAdd = document.querySelector('.profile__add-button');
 const formCard = document.forms['new-place'];
 const placeInput = formCard.elements['place-name'];
 const linkInput = formCard.elements.link;
+const imageModal = document.querySelector('.popup_type_image');
+const image = document.querySelector('.popup__image');
+const description = document.querySelector('.popup__caption');
 
 // Вывести карточки на страницу
 
@@ -27,25 +30,32 @@ initialCards.forEach (function(card) {
 
 // Открытие и закрытие модальных окон
 
-buttonEdit.addEventListener('click', openModal(modalEdit));
+buttonEdit.addEventListener('click', () => openModalEdit());
 
-buttonAdd.addEventListener('click', openModal(modalCard));
+buttonAdd.addEventListener('click', () => openModal(modalCard));
 
 buttonsClose.forEach(button => {
     button.addEventListener('click', function() {
         const popup = this.closest('.popup');
         if (popup) {
-            closeModal(popup)();
+            closeModal(popup);
         }
     });
 });
 
-modals.forEach(function(modal) {
-    document.addEventListener('keydown', closeModalEscape(modal))
-})
+// Функция открытия картинки из карточки 
+
+function openImage() {
+    openModal(imageModal);
+    image.src = this.src;
+    description.alt = this.alt;
+    description.textContent = this.alt;
+}
+
+// Добавление плавности при открытии и закрытии 
 
 modals.forEach(function(modal) {
-    modal.addEventListener('click', closeModalOverlay);
+    modal.classList.add('popup_is-animated');
 })
 
 // текстовые поля имя профиля и о себе
@@ -56,17 +66,22 @@ const formProfile = document.forms['edit-profile'];
 const nameInput = formProfile.elements.name;
 const jobInput = formProfile.elements.description;
 
-nameInput.value = name.textContent;
-jobInput.value = job.textContent;
+// Функция открытия модального окна редактировать 
 
-function handleFormSubmit(evt) {
+function openModalEdit() {
+    openModal(modalEdit);
+    nameInput.value = name.textContent;
+    jobInput.value = job.textContent;
+}
+
+function submitEditProfileForm(evt) {
     evt.preventDefault();
     name.textContent = nameInput.value;
     job.textContent = jobInput.value;
-    closeModal(modalEdit)();
+    closeModal(modalEdit);
 }
 
-formProfile.addEventListener('submit', handleFormSubmit);
+formProfile.addEventListener('submit', submitEditProfileForm);
 
 // добавление своей карточки 
 
@@ -75,10 +90,9 @@ function handleFormCardSubmit(evt) {
     const newPlace = placeInput.value;
     const newLink = linkInput.value;
     const newInfo = { name: newPlace, link: newLink };
-    initialCards.unshift(newInfo);
     const newCard = createCard(newInfo, deleteCard, like,  openImage);
     cardList.prepend(newCard);
-    closeModal(modalCard)();
+    closeModal(modalCard);
     formCard.reset();
 }
 
