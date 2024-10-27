@@ -25,3 +25,9 @@
     line-height: 17px;
   }
 }
+
+.popup__button_disabled {
+  color: rgb(197 197 197);
+  background: transparent;
+  outline: 2px solid rgb(197 197 197);
+}
