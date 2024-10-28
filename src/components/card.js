@@ -52,17 +52,10 @@ function createCard({
   return cardElement;
 }
 
-// Функция лайка карточки
-
-function like(evt) {
-  const eventTarget = evt.target;
-  eventTarget.classList.toggle('card__like-button_is-active');
-}
-
 // Функция удаления карточки
 
 function deleteCard(card) {
   card.remove();
 }
 
-export { createCard, like, deleteCard };
+export { createCard, deleteCard };

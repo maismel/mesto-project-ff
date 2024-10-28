@@ -1,20 +1,20 @@
 // валидация форм
 
-const showInputError = (formElement, inputElement, errorMessage) => {
+const showInputError = (formElement, inputElement, errorMessage, settings) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.add('popup__input_type_error');
+    inputElement.classList.add(settings.inputErrorClass);
     errorElement.textContent = errorMessage;
-    errorElement.classList.add('input-error_active');
+    errorElement.classList.add(settings.errorClass);
 }
 
-const hideInputError = (formElement, inputElement) => {
+const hideInputError = (formElement, inputElement, settings) => {
     const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
-    inputElement.classList.remove('popup__input_type_error');
+    inputElement.classList.remove(settings.inputErrorClass);
     errorElement.textContent = '';
-    errorElement.classList.remove('input-error_active');
+    errorElement.classList.remove(settings.errorClass);
 }
 
-const isValid = (formElement, inputElement) => {
+const isValid = (formElement, inputElement, settings) => {
     if (inputElement.validity.patternMismatch) {
         inputElement.setCustomValidity(inputElement.dataset.errorMessage);
     } else {
@@ -22,45 +22,46 @@ const isValid = (formElement, inputElement) => {
     }
 
     if (!inputElement.validity.valid) {
-        showInputError(formElement, inputElement, inputElement.validationMessage);
+        showInputError(formElement, inputElement, inputElement.validationMessage, settings);
     } else {
-        hideInputError(formElement, inputElement);
+        hideInputError(formElement, inputElement, settings);
     }
 }
 
 const hasInputInvalid = (inputList) => {
-    return inputList.some((inputElement) => {
-        return !inputElement.validity.valid;
-    })
-  }
-
-const toggleButtonState = (inputList, buttonElement) => {
-    if (hasInputInvalid(inputList)) {
-        buttonElement.disabled = true;
-        buttonElement.classList.add('popup__button_disabled');
-    } else {
-        buttonElement.disabled = false;
-        buttonElement.classList.remove('popup__button_disabled');
-    }
-  }
-
-const setEventListeners = (formElement) => {
-    const inputList = Array.from(formElement.querySelectorAll('.popup__input'));
-    const buttonElement = formElement.querySelector('.popup__button');
-    toggleButtonState(inputList, buttonElement);
-    inputList.forEach((inputElement) => {
-        inputElement.addEventListener('input', () => {
-            isValid(formElement, inputElement);
-            toggleButtonState(inputList, buttonElement);
-        })
-    })
+    const isInvalid = inputList.some((inputElement) => !inputElement.validity.valid);
+    return isInvalid;
 }
 
-const enableValidation = () => {
-    const formList = Array.from(document.querySelectorAll('.popup__form'));
+const toggleButtonState = (inputList, buttonElement, settings) => {
+    if (hasInputInvalid(inputList)) {
+        buttonElement.disabled = true;
+        buttonElement.classList.add(settings.inactiveButtonClass);
+    } else {
+        buttonElement.disabled = false;
+        buttonElement.classList.remove(settings.inactiveButtonClass);
+    }
+};
+
+
+const setEventListeners = (formElement, settings) => {
+    const inputList = Array.from(formElement.querySelectorAll(settings.inputSelector));
+    const buttonElement = formElement.querySelector(settings.submitButtonSelector);
+    toggleButtonState(inputList, buttonElement, settings);
+
+    inputList.forEach((inputElement) => {
+        inputElement.addEventListener('input', () => {
+            isValid(formElement, inputElement, settings);
+            toggleButtonState(inputList, buttonElement, settings);
+        });
+    });
+}
+
+const enableValidation = (settings) => {
+    const formList = Array.from(document.querySelectorAll(settings.formSelector));
     formList.forEach((formElement) => {
-      setEventListeners(formElement);
+        setEventListeners(formElement, settings);
     });
 };
 
-export { enableValidation }
+export { enableValidation };
